@@ -675,8 +675,8 @@ public class Apptentive {
 	 *                  call <strong><code>engage(activity, "finished_upload");</code></strong>
 	 * @return true if the an interaction was shown, else false.
 	 */
-	public static synchronized boolean engage(Activity activity, String event) {
-		return EngagementModule.engage(activity, "local", "app", event);
+	public static synchronized boolean engage(Context contxt, String event) {
+		return EngagementModule.engage(contxt, "local", "app", event);
 	}
 
 	/**
@@ -693,8 +693,8 @@ public class Apptentive {
 	 *                   is sent to the server for tracking information in the context of the engaged Event.
 	 * @return true if the an interaction was shown, else false.
 	 */
-	public static synchronized boolean engage(Activity activity, String event, Map<String, Object> customData) {
-		return EngagementModule.engage(activity, "local", "app", event, null, customData, (ExtendedData[]) null);
+	public static synchronized boolean engage(Context contxt, String event, Map<String, Object> customData) {
+		return EngagementModule.engage(contxt, "local", "app", event, null, customData, (ExtendedData[]) null);
 	}
 
 	/**
@@ -715,8 +715,8 @@ public class Apptentive {
 	 *                     {@link LocationExtendedData}, and {@link CommerceExtendedData}. Include each type only once.
 	 * @return true if the an interaction was shown, else false.
 	 */
-	public static synchronized boolean engage(Activity activity, String event, Map<String, Object> customData, ExtendedData... extendedData) {
-		return EngagementModule.engage(activity, "local", "app", event, null, customData, extendedData);
+	public static synchronized boolean engage(Context contxt, String event, Map<String, Object> customData, ExtendedData... extendedData) {
+		return EngagementModule.engage(contxt, "local", "app", event, null, customData, extendedData);
 	}
 
 	/**

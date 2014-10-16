@@ -7,6 +7,7 @@
 package com.apptentive.android.sdk.module.engagement;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import com.apptentive.android.sdk.Log;
 import com.apptentive.android.sdk.R;
@@ -27,56 +28,57 @@ import java.util.Map;
  */
 public class EngagementModule {
 
-	public static synchronized boolean engageInternal(Activity activity, String eventName) {
-		return engage(activity, "com.apptentive", "app", eventName, null, null, (ExtendedData[]) null);
+	public static synchronized boolean engageInternal(Context context, String eventName) {
+		return engage(context, "com.apptentive", "app", eventName, null, null, (ExtendedData[]) null);
 	}
 
-	public static synchronized boolean engageInternal(Activity activity, String interaction, String eventName) {
-		return engage(activity, "com.apptentive", interaction, eventName, null, null, (ExtendedData[]) null);
+	public static synchronized boolean engageInternal(Context context, String interaction, String eventName) {
+		return engage(context, "com.apptentive", interaction, eventName, null, null, (ExtendedData[]) null);
 	}
 
-	public static synchronized boolean engageInternal(Activity activity, String interaction, String eventName, Map<String, String> data) {
-		return engage(activity, "com.apptentive", interaction, eventName, data, null, (ExtendedData[]) null);
+	public static synchronized boolean engageInternal(Context context, String interaction, String eventName, Map<String, String> data) {
+		return engage(context, "com.apptentive", interaction, eventName, data, null, (ExtendedData[]) null);
 	}
 
-	public static synchronized boolean engage(Activity activity, String vendor, String interaction, String eventName) {
-		return engage(activity, vendor, interaction, eventName, null, null, (ExtendedData[]) null);
+	public static synchronized boolean engage(Context context, String vendor, String interaction, String eventName) {
+		return engage(context, vendor, interaction, eventName, null, null, (ExtendedData[]) null);
 	}
 
-	public static synchronized boolean engage(Activity activity, String vendor, String interaction, String eventName, Map<String, String> data, Map<String, Object> customData, ExtendedData... extendedData) {
+	public static synchronized boolean engage(Context context, String vendor, String interaction, String eventName, Map<String, String> data, Map<String, Object> customData, ExtendedData... extendedData) {
 		try {
 			String eventLabel = generateEventLabel(vendor, interaction, eventName);
 			Log.d("engage(%s)", eventLabel);
 
-			CodePointStore.storeCodePointForCurrentAppVersion(activity.getApplicationContext(), eventLabel);
-			EventManager.sendEvent(activity.getApplicationContext(), new Event(eventLabel, data, customData, extendedData));
-			return doEngage(activity, eventLabel);
+			CodePointStore.storeCodePointForCurrentAppVersion(context.getApplicationContext(), eventLabel);
+			EventManager.sendEvent(context.getApplicationContext(), new Event(eventLabel, data, customData, extendedData));
+			return doEngage(context, eventLabel);
 		} catch (Exception e) {
-			MetricModule.sendError(activity.getApplicationContext(), e, null, null);
+			MetricModule.sendError(context.getApplicationContext(), e, null, null);
 		}
 		return false;
 	}
 
-	public static boolean doEngage(Activity activity, String eventLabel) {
-		Interaction interaction = InteractionManager.getApplicableInteraction(activity.getApplicationContext(), eventLabel);
+
+	public static boolean doEngage(Context context, String eventLabel) {
+		Interaction interaction = InteractionManager.getApplicableInteraction(context.getApplicationContext(), eventLabel);
 		if (interaction != null) {
-			CodePointStore.storeInteractionForCurrentAppVersion(activity, interaction.getId());
-			launchInteraction(activity, interaction);
+			CodePointStore.storeInteractionForCurrentAppVersion(context, interaction.getId());
+			launchInteraction(context, interaction);
 			return true;
 		}
 		Log.d("No interaction to show.");
 		return false;
 	}
 
-	public static void launchInteraction(Activity activity, Interaction interaction) {
+	public static void launchInteraction(Context context, Interaction interaction) {
 		if (interaction != null) {
 			Log.e("Launching interaction: %s", interaction.getType().toString());
 			Intent intent = new Intent();
-			intent.setClass(activity, ViewActivity.class);
+			intent.setClass(context, ViewActivity.class);
 			intent.putExtra(ActivityContent.KEY, ActivityContent.Type.INTERACTION.toString());
 			intent.putExtra(Interaction.KEY_NAME, interaction.toString());
-			activity.startActivity(intent);
-			activity.overridePendingTransition(R.anim.slide_up_in, 0);
+            context.startActivity(intent);
+            //context.overridePendingTransition(R.anim.slide_up_in, 0);
 		}
 	}
 
