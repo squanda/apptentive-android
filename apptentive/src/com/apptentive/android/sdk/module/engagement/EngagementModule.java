@@ -75,7 +75,8 @@ public class EngagementModule {
 			Log.e("Launching interaction: %s", interaction.getType().toString());
 			Intent intent = new Intent();
 			intent.setClass(context, ViewActivity.class);
-			intent.putExtra(ActivityContent.KEY, ActivityContent.Type.INTERACTION.toString());
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            intent.putExtra(ActivityContent.KEY, ActivityContent.Type.INTERACTION.toString());
 			intent.putExtra(Interaction.KEY_NAME, interaction.toString());
             context.startActivity(intent);
 
