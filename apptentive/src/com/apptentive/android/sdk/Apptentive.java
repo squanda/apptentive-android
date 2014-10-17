@@ -62,15 +62,15 @@ public class Apptentive {
 	 *
 	 * @param activity The Activity from which this method is called.
 	 */
-	public static void onStart(Activity activity) {
+	public static void onStart(Context context) {
 		try {
-			init(activity);
-			ActivityLifecycleManager.activityStarted(activity);
-			PayloadSendWorker.activityStarted(activity.getApplicationContext());
-			MessagePollingWorker.start(activity.getApplicationContext());
+			init(context);
+			ActivityLifecycleManager.activityStarted(context);
+			PayloadSendWorker.activityStarted(context.getApplicationContext());
+			MessagePollingWorker.start(context.getApplicationContext());
 		} catch (Exception e) {
 			Log.w("Error starting Apptentive Activity.", e);
-			MetricModule.sendError(activity.getApplicationContext(), e, null, null);
+			MetricModule.sendError(context.getApplicationContext(), e, null, null);
 		}
 	}
 
@@ -79,15 +79,15 @@ public class Apptentive {
 	 *
 	 * @param activity The Activity from which this method is called.
 	 */
-	public static void onStop(Activity activity) {
+	public static void onStop(Context context) {
 		try {
-			ActivityLifecycleManager.activityStopped(activity);
+			ActivityLifecycleManager.activityStopped(context);
 			NetworkStateReceiver.clearListeners();
 			PayloadSendWorker.activityStopped();
 			MessagePollingWorker.stop();
 		} catch (Exception e) {
 			Log.w("Error stopping Apptentive Activity.", e);
-			MetricModule.sendError(activity.getApplicationContext(), e, null, null);
+			MetricModule.sendError(context.getApplicationContext(), e, null, null);
 		}
 	}
 
@@ -731,13 +731,13 @@ public class Apptentive {
 	// INTERNAL METHODS
 	// ****************************************************************************************
 
-	private static void init(Activity activity) {
+	private static void init(Context context) {
 
 		//
 		// First, initialize data relies on synchronous reads from local resources.
 		//
 
-		final Context appContext = activity.getApplicationContext();
+		final Context appContext = context.getApplicationContext();
 
 		if (!GlobalInfo.initialized) {
 			SharedPreferences prefs = appContext.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
@@ -766,7 +766,7 @@ public class Apptentive {
 			String errorString = "No Apptentive api key specified. Please make sure you have specified your api key in your AndroidManifest.xml";
 			if ((Util.isEmpty(apiKey))) {
 				if (GlobalInfo.isAppDebuggable) {
-					AlertDialog alertDialog = new AlertDialog.Builder(activity)
+					AlertDialog alertDialog = new AlertDialog.Builder(context)
 						.setTitle("Error")
 						.setMessage(errorString)
 						.setPositiveButton("OK", null)

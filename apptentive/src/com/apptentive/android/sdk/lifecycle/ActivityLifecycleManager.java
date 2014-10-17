@@ -66,21 +66,21 @@ public class ActivityLifecycleManager {
 	private static Context appContext = null;
 	private static PersistentSessionQueue queue = null;
 
-	private static void sendEvent(Activity activity, SessionEvent event) {
-		sendEvent(activity, event, false);
+	private static void sendEvent(Context context, SessionEvent event) {
+		sendEvent(context, event, false);
 	}
 
-	private static void sendEvent(Activity activity, SessionEvent event, boolean crash) {
+	private static void sendEvent(Context context, SessionEvent event, boolean crash) {
 		Log.d("Sending " + event.getDebugString());
 		switch (event.getAction()) {
 			case START:
 				if (!crash) {
 					// Don't trigger a launch in this case, to prevent possible looping crashes.
-					ApptentiveInternal.onAppLaunch(activity);
+					ApptentiveInternal.onAppLaunch(context);
 				}
 				break;
 			case STOP:
-				EngagementModule.engageInternal(activity, Event.EventLabel.app__exit.getLabelName());
+				EngagementModule.engageInternal(context, Event.EventLabel.app__exit.getLabelName());
 				break;
 			default:
 				break;
@@ -90,10 +90,10 @@ public class ActivityLifecycleManager {
 	/**
 	 * Internal use only.
 	 */
-	public static void activityStarted(Activity activity) {
+	public static void activityStarted(Context context) {
 		try {
-			init(activity);
-			SessionEvent start = new SessionEvent(new Date().getTime(), SessionEvent.Action.START, activity.toString());
+			init(context);
+			SessionEvent start = new SessionEvent(new Date().getTime(), SessionEvent.Action.START, context.toString());
 
 			// Get last stop
 			SessionEvent lastStop = getLastEvent(SessionEvent.Action.STOP);
@@ -111,14 +111,14 @@ public class ActivityLifecycleManager {
 			if (pairs == 0 && starts == 0) {
 				Log.v("First start.");
 				addEvents(start);
-				sendEvent(activity, start);
+				sendEvent(context, start);
 			} else if (pairs == 0 && starts == 1) {
 				Log.v("Continuation Start. (1)");
 				addEvents(start);
 			} else if (pairs == 0 && starts == 2) {
 				Log.i("Starting new session after crash. (1)");
 				removeAllEvents();
-				sendEvent(activity, lastStart != null ? lastStart : start, true);
+				sendEvent(context, lastStart != null ? lastStart : start, true);
 				addEvents(lastStart, start);
 			} else if (pairs == 1 && starts == 1) {
 				long expiration = lastStop.getTime() + (SESSION_TIMEOUT_SECONDS * 1000);
@@ -126,8 +126,8 @@ public class ActivityLifecycleManager {
 				addEvents(start);
 				if (expired) {
 					Log.d("Session expired. Starting new session.");
-					sendEvent(activity, lastStop);
-					sendEvent(activity, start);
+					sendEvent(context, lastStop);
+					sendEvent(context, start);
 				} else {
 					Log.v("Continuation Start. (2)");
 				}
@@ -136,7 +136,7 @@ public class ActivityLifecycleManager {
 				addEvents(start);
 			} else if (pairs == 1 && starts == 3) {
 				Log.i("Starting new session after crash. (2)");
-				sendEvent(activity, lastStart != null ? lastStart : start, true);
+				sendEvent(context, lastStart != null ? lastStart : start, true);
 				// Reconstruct Queue.
 				removeAllEvents();
 				addEvents(lastStart, start);
@@ -151,10 +151,10 @@ public class ActivityLifecycleManager {
 	/**
 	 * Internal use only.
 	 */
-	public static void activityStopped(Activity activity) {
+	public static void activityStopped(Context context) {
 		try {
-			init(activity);
-			addEvents(new SessionEvent(new Date().getTime(), SessionEvent.Action.STOP, activity.toString()));
+			init(context);
+			addEvents(new SessionEvent(new Date().getTime(), SessionEvent.Action.STOP, context.toString()));
 		} catch (Exception e) {
 			Log.e("Error while handling activity stop.", e);
 		}

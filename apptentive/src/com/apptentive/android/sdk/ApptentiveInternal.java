@@ -7,6 +7,8 @@
 package com.apptentive.android.sdk;
 
 import android.app.Activity;
+import android.content.Context;
+
 import com.apptentive.android.sdk.model.Event;
 import com.apptentive.android.sdk.module.engagement.EngagementModule;
 import com.apptentive.android.sdk.module.rating.IRatingProvider;
@@ -43,8 +45,8 @@ public class ApptentiveInternal {
 		}
 	}
 
-	public static void onAppLaunch(final Activity activity) {
-		EngagementModule.engageInternal(activity, Event.EventLabel.app__launch.getLabelName());
+	public static void onAppLaunch(final Context context) {
+		EngagementModule.engageInternal(context, Event.EventLabel.app__launch.getLabelName());
 	}
 
 	public static IRatingProvider getRatingProvider() {

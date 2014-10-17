@@ -78,7 +78,7 @@ public class EngagementModule {
 			intent.putExtra(ActivityContent.KEY, ActivityContent.Type.INTERACTION.toString());
 			intent.putExtra(Interaction.KEY_NAME, interaction.toString());
             context.startActivity(intent);
-            //context.overridePendingTransition(R.anim.slide_up_in, 0);
+
 		}
 	}
 
